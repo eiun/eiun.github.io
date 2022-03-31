@@ -1,0 +1,364 @@
+<html>
+<head>
+  <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="all,follow">
+<meta name="googlebot" content="index,follow,snippet,archive">
+<title>绕过Android 10的反射限制方法 | Eiun</title>
+<link rel="shortcut icon" href="https://eiun.github.io/favicon.ico?v=1648712947239">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+<link rel="stylesheet" href="https://eiun.github.io/styles/main.css" type='text/css' media='all'>
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+
+
+
+</head>
+<body class="home blog ct-body standard">
+<div id="overflow-container" class="overflow-container">
+  <a class="skip-content" href="#main">Skip to content</a>
+  <header id="site-header" class="site-header" role="banner">
+    <div class='top-navigation top-navigation-important'>
+        <div class='container'>
+            <div id="menu-secondary" class="menu-container menu-secondary" role="navigation">
+                <button id="toggle-secondary-navigation" class="toggle-secondary-navigation"><i class="fa fa-plus"></i></button>
+                <div class="menu">
+                    <ul id="menu-secondary-items" class="menu-secondary-items">
+                        
+                        
+                            
+                        <li id="menu-item" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item">
+                            <a href="https://eiun.github.io/tag/ymhtHghCa/">Android</a>
+                        </li>
+                            
+                        
+                    </ul>
+                </div>
+            </div>
+            <ul class="social-media-icons">
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="title-info" class="title-info">
+            <div id='site-title' class='site-title'>
+                <a href="/https://eiun.github.io">  Eiun </a>
+            </div>
+        </div>
+        <button id="toggle-navigation" class="toggle-navigation">
+            <i class="fa fa-bars"></i>
+        </button>
+        <div id="menu-primary-tracks" class="menu-primary-tracks"></div>
+        <div id="menu-primary" class="menu-container menu-primary" role="navigation">
+            <p class="site-description">温故而知新</p>
+            <div class="menu">
+                <ul id="menu-primary-items" class="menu-primary-items">
+                     
+                        
+                            <li id="menu-item" class='menu-item menu-item-type-post_type menu-item-object-page current-menu-item current_page_item'>
+                                <a href="/">首页</a>
+                            </li>
+                        
+                    
+                        
+                            <li id="menu-item" class='menu-item menu-item-type-post_type menu-item-object-page current-menu-item current_page_item'>
+                                <a href="/archives">归档</a>
+                            </li>
+                        
+                    
+                        
+                            <li id="menu-item" class='menu-item menu-item-type-post_type menu-item-object-page current-menu-item current_page_item'>
+                                <a href="/tags">标签</a>
+                            </li>
+                        
+                    
+                        
+                            <li id="menu-item" class='menu-item menu-item-type-post_type menu-item-object-page current-menu-item current_page_item'>
+                                <a href="/post/about">关于</a>
+                            </li>
+                        
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+</header>
+
+  <div id="main" class="main" role="main">
+    <div id="loop-container" class="loop-container">
+      <div class="post type-post status-publish format-standard has-post-thumbnail hentry category-design tag-design tag-standard-2 tag-tagalicious tag-travel entry full-without-featured odd excerpt-1">
+        
+          <div class='featured-image lazy lazy-bg-image' data-background="https://picsum.photos/seed/154047/1600/900">
+          </div>
+        
+
+        <div class="entry-meta">
+          <span class="date">· 2022-03-31 ·</span> <span> / </span>
+          <span class="author">
+            <a href="https://eiun.github.io" title="" rel="author"> Eiun</a>
+          </span>
+          
+            <span class="category">
+                    <span> / </span>
+                    <a href="https://eiun.github.io/tag/ymhtHghCa/">Android</a>
+                </span>
+          
+        </div>
+        <div class='entry-header'>
+          <h1 class='entry-title'>绕过Android 10的反射限制方法</h1>
+        </div>
+        <div class="entry-container">
+          <div class="entry-content">
+            <article>
+              <h3 id="绕过android-10的反射限制方法">绕过Android 10的反射限制方法</h3>
+<h4 id="限制的原因">限制的原因</h4>
+<p>​	在Android 10 及以上版本，通过反射或者JNI访问非公开接口时会触发警告/异常等，在代码中从 <code>java.lang.Class.getDeclaredMethod(String)</code> 看起，这个方法在Java层最终调用到了 <code>getDeclaredMethodInternal</code> 这个native方法，这个方法的源码为：</p>
+<pre><code>static jobject Class_getDeclaredMethodInternal(JNIEnv* env, jobject javaThis,
+                                               jstring name, jobjectArray args) {
+  ScopedFastNativeObjectAccess soa(env);
+  StackHandleScope&lt;1&gt; hs(soa.Self());
+  DCHECK_EQ(Runtime::Current()-&gt;GetClassLinker()-&gt;GetImagePointerSize(), kRuntimePointerSize);
+  DCHECK(!Runtime::Current()-&gt;IsActiveTransaction());
+  Handle&lt;mirror::Method&gt; result = hs.NewHandle(
+      mirror::Class::GetDeclaredMethodInternal&lt;kRuntimePointerSize, false&gt;(
+          soa.Self(),
+          DecodeClass(soa, javaThis),
+          soa.Decode&lt;mirror::String&gt;(name),
+          soa.Decode&lt;mirror::ObjectArray&lt;mirror::Class&gt;&gt;(args)));
+  if (result == nullptr || ShouldBlockAccessToMember(result-&gt;GetArtMethod(), soa.Self())) {
+    return nullptr;
+  }
+  return soa.AddLocalReference&lt;jobject&gt;(result.Get());
+}
+</code></pre>
+<p>​	关键点在于<strong>ShouldBlockAccessToMember</strong> 这个方法，如果它返回true，那么直接返回<code>nullptr</code>，上层就会抛 <code>NoSuchMethodXXX</code> 异常；因为触发到了系统的限制。而这个方法的实现是：</p>
+<pre><code>ALWAYS_INLINE static bool ShouldBlockAccessToMember(T* member, Thread* self)
+    REQUIRES_SHARED(Locks::mutator_lock_) {
+  hiddenapi::Action action = hiddenapi::GetMemberAction(
+      member, self, IsCallerTrusted, hiddenapi::kReflection);
+  if (action != hiddenapi::kAllow) {
+    hiddenapi::NotifyHiddenApiListener(member);
+  }
+  return action == hiddenapi::kDeny;
+}
+</code></pre>
+<p>继续找到action的赋值方法GetMemberAction：</p>
+<pre><code>template&lt;typename T&gt;
+inline Action GetMemberAction(T* member,
+                              Thread* self,
+                              std::function&lt;bool(Thread*)&gt; fn_caller_is_trusted,
+                              AccessMethod access_method)
+    REQUIRES_SHARED(Locks::mutator_lock_) {
+  DCHECK(member != nullptr);
+  // Decode hidden API access flags.
+  // NB Multiple threads might try to access (and overwrite) these simultaneously,
+  // causing a race. We only do that if access has not been denied, so the race
+  // cannot change Java semantics. We should, however, decode the access flags
+  // once and use it throughout this function, otherwise we may get inconsistent
+  // results, e.g. print whitelist warnings (b/78327881).
+  HiddenApiAccessFlags::ApiList api_list = member-&gt;GetHiddenApiAccessFlags();
+  Action action = GetActionFromAccessFlags(member-&gt;GetHiddenApiAccessFlags());
+  if (action == kAllow) {
+    // Nothing to do.
+    return action;
+  }
+  // Member is hidden. Invoke `fn_caller_in_platform` and find the origin of the access.
+  // This can be *very* expensive. Save it for last.
+  if (fn_caller_is_trusted(self)) {
+    // Caller is trusted. Exit.
+    return kAllow;
+  }
+  // Member is hidden and caller is not in the platform.
+  return detail::GetMemberActionImpl(member, api_list, action, access_method);
+}
+</code></pre>
+<p>​	关键点在于这个方法的三个return 语句</p>
+<p>​	先看第一个return语句，<code>GetActionFromAccessFlags</code>如果 Method/Field 是白名单，那么直接允许访问。</p>
+<p>​	第二个return语句，<code>fn_caller_is_trusted</code>，这个方法通过回溯调用栈，通过调用者的Class来判断是否是系统代码的调用（所有系统的代码都通过BootClassLoader加载，判断ClassLoader即可），如果是系统代码，那么就允许调用（系统自己的API肯定得让它调）。</p>
+<p>​	最后一个里面的代码有：</p>
+<pre><code>if (shouldWarn || action == kDeny) {
+    if (member_signature.IsExempted(runtime-&gt;GetHiddenApiExemptions())) {
+      action = kAllow;
+      // Avoid re-examining the exemption list next time.
+      // Note this results in no warning for the member, which seems like what one would expect.
+      // Exemptions effectively adds new members to the whitelist.
+      MaybeWhitelistMember(runtime, member);
+      return kAllow;
+    }
+    // 略    
+}
+</code></pre>
+<p>​	只要 <code>IsExempted</code> 方法返回 true，就算这个方法在黑名单中，依然会被放行然后允许被调用。</p>
+<p>​	这个API 竟然是暴露到 Java 层的，有一个对应的 <a href="http://androidxref.com/9.0.0_r3/xref/libcore/libart/src/main/java/dalvik/system/VMRuntime.java#278">VMRuntime.setHiddenApiExemptions</a> Java方法；也就是说，只要我们通过 <code>VMRuntime.setHiddenApiExemptions</code> 设置下豁免条件，我们就能使用反射了。</p>
+<p>​	上面的 <code>IsExempted</code> 方法里面调用的 <code>DoesPrefixMatch</code>，发现这个逻辑是在对方法签名进行前缀匹配；而且所有Java方法类的签名都是以 <strong>L</strong> 开头的！如果我们把直接传个 <code>L</code>到 <code>VMRuntime.setHiddenApiExemptions</code> 里面，所有的隐藏API全部被赦免了！</p>
+<h4 id="解决方案">解决方案</h4>
+<h5 id="1利用反射去反射调用方法">1.利用反射去反射调用方法</h5>
+<p>​	因为借助系统的类去反射调用方法是有权限的，如果系统有一个方法<code>systemMethod</code>，这个<code>systemMethod</code> 去调用反射相反的方法，那么<code>systemMethod</code>毋庸置疑会反射成功。我们可以找到这个系统的类，这个系统的类就是反射本身。</p>
+<ol>
+<li>
+<p>首先，通过反射 API 拿到 <code>getDeclaredMethod</code> 方法。<code>getDeclaredMethod</code> 是 public 的，不存在问题。</p>
+</li>
+<li>
+<p>然后，通过刚刚反射拿到反射本身去反射调用 <code>getDeclardMethod</code>。这里我们就实现了<strong><strong>以系统身份去反射</strong></strong>的目的——反射相关的 API 都是系统类，因此反射拿到的反射方法也是被系统类加载的方法；所以调用的 <code>getDeclardMethod</code> 会被认为是系统调用的，可以反射任意的方法。</p>
+<p>例子：TelephonyManager里面的隐藏方法getITelephony被限制反射调用</p>
+<pre><code>/**
+ * @hide
+ */
+ @UnsupportedAppUsage(maxTargetSdk = Build.VERSION_CODES.P)
+ private ITelephony getITelephony() {
+     return ITelephony.Stub.asInterface(TelephonyFrameworkInitializer
+             .getTelephonyServiceManager().getTelephonyServiceRegisterer().get());
+ }
+</code></pre>
+<p>通过反射拿到反射本身的系统类，再去反射可以拿到iTelephony这个接口。</p>
+<pre><code>Method forName = Class.class.getDeclaredMethod(&quot;forName&quot;, String.class);
+Method getDeclaredMethod = Class.class.getDeclaredMethod(&quot;getDeclaredMethod&quot;, String.class, Class[].class);
+Class&lt;?&gt; telManager = (Class&lt;?&gt;) forName.invoke(null, &quot;android.telephony.TelephonyManager&quot;);
+Method getTelephony = (Method) getDeclaredMethod.invoke(telManager, &quot;getITelephony&quot;, null);
+getTelephony.setAccessible(true);
+Object iTelephony = getTelephony.invoke(mTelephonyManager);
+</code></pre>
+</li>
+</ol>
+<h5 id="2设置sethiddenapiexemptions的标识一劳永逸">2.设置setHiddenApiExemptions的标识一劳永逸</h5>
+<pre><code>private void showHideMethod() {
+    if (android.os.Build.VERSION.SDK_INT &lt; Build.VERSION_CODES.P) {
+        return;
+    }
+    try {
+        Method forName = Class.class.getDeclaredMethod(&quot;forName&quot;, String.class);
+        Method getDeclaredMethod = Class.class.getDeclaredMethod(&quot;getDeclaredMethod&quot;, String.class, Class[].class);
+        Class&lt;?&gt; vmRuntimeClass = (Class&lt;?&gt;) forName.invoke(null, &quot;dalvik.system.VMRuntime&quot;);
+        Method getRuntime = (Method) getDeclaredMethod.invoke(vmRuntimeClass, &quot;getRuntime&quot;, null);
+        Method setHiddenApiExemptions = (Method) getDeclaredMethod.invoke(vmRuntimeClass, &quot;setHiddenApiExemptions&quot;, new Class[]{String[].class});
+        Object sVmRuntime = getRuntime.invoke(null);
+        setHiddenApiExemptions.invoke(sVmRuntime, new Object[]{new String[]{&quot;L&quot;}});
+    } catch (Throwable e) {
+        Log.e(&quot;[error]&quot;, &quot;reflect bootstrap failed:&quot;, e);
+    }
+}
+</code></pre>
+<p>设置了L的标识符后，后续的所有的反射都被允许。</p>
+
+            </article>
+          </div>
+          <div class='entry-meta-bottom'>
+            <div class="entry-categories">
+              <p>
+                <span>Categories</span>
+                
+                  
+                    
+                  <a href="https://eiun.github.io/tag/ymhtHghCa/" title="View all posts in Android">Android</a>
+                    
+                    
+              </p>
+            </div>
+            <div class="entry-tags">
+              <p><span>Tags</span>
+              </p>
+            </div>
+          </div>
+          <div class="author-meta">
+            <div class="author">
+              <img alt='' src="https://eiun.github.io/images/avatar.png?v=1648712947239" class='avatar avatar-72 photo' height='72' width='72'>
+              <span>WRITTEN BY: &nbsp;&nbsp;&nbsp;<a href='https://eiun.github.io'></a> </span>
+            </div>
+            <div class="bio">
+              <p></p>
+              
+                
+              
+                
+              
+                
+              
+                
+              
+                
+              
+                
+              
+                
+              
+            </div>
+          </div>
+        </div>
+          
+            <nav class="navigation pagination" role="navigation">
+              <h2 class="screen-reader-text">Posts navigation</h2>
+              <div class="nav-links">
+                <a class="next page-numbers" href="https://eiun.github.io/post/webview-nei-cun-xie-lou-yan-jiu/">下一篇->WebView内存泄漏研究</a>
+              </div>
+            </nav>
+          
+      </div>
+      <section id="comments" class="comments">
+        
+      </section>
+    </div>
+  </div>
+
+  <footer id="site-footer" class="site-footer" role="contentinfo">
+    <h1>
+        <a href="https://eiun.github.io"> Eiun </a>
+    </h1>
+    <p class="site-description">温故而知新</p>
+    <div id="menu-footer" class="menu-container menu-footer" role="navigation">
+        <div class="menu">
+            <ul id="menu-footer-items" class="menu-footer-items">
+            </ul>
+        </div>
+    </div>
+    <ul class="social-media-icons">
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </ul>
+    <div class="design-credit">
+        <p>Eiun</p>
+    </div>
+</footer>
+<script>
+    hljs.initHighlightingOnLoad()
+</script>
+<script src="https://eiun.github.io/media/scripts/lib/jquery.min.js"></script>
+<script src="https://eiun.github.io/media/scripts/lib/jquerymigrate.js"></script>
+<script src="https://eiun.github.io/media/scripts/lib/production.min.js"></script>
+</div>
+</body>
+</html>
+

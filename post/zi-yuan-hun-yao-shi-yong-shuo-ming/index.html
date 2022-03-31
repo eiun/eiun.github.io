@@ -1,11 +1,11 @@
 <html>
-  <head>
-    <meta charset="utf-8" />
+<head>
+  <meta charset="utf-8" />
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="all,follow">
 <meta name="googlebot" content="index,follow,snippet,archive">
-<title>Eiun</title>
+<title>资源混淆使用说明 | Eiun</title>
 <link rel="shortcut icon" href="https://eiun.github.io/favicon.ico?v=1648712947239">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 <link rel="stylesheet" href="https://eiun.github.io/styles/main.css" type='text/css' media='all'>
@@ -16,11 +16,11 @@
 
 
 
-  </head>
-  <body class="home blog ct-body standard">
-    <div id="overflow-container" class="overflow-container">
-    <a class="skip-content" href="#main">Skip to content</a>
-        <header id="site-header" class="site-header" role="banner">
+</head>
+<body class="home blog ct-body standard">
+<div id="overflow-container" class="overflow-container">
+  <a class="skip-content" href="#main">Skip to content</a>
+  <header id="site-header" class="site-header" role="banner">
     <div class='top-navigation top-navigation-important'>
         <div class='container'>
             <div id="menu-secondary" class="menu-container menu-secondary" role="navigation">
@@ -105,98 +105,94 @@
 
 </header>
 
-        <div id="main" class="main" role="main">
-  <h1 class="screen-reader-text">Posts</h1>
-  
-  <div id="loop-container" class="loop-container">
-    <div class="post type-post status-publish format-standard   has-post-thumbnail hentry category-design tag-memories
-    tag-normal-post tag-standard-2 excerpt zoom full-without-featured
-      
-      even
-       excerpt">
-      
-      <a class="featured-image-link" href="https://eiun.github.io/post/rao-guo-android-10-de-fan-she-xian-zhi-fang-fa/">
-        <div class='featured-image lazy lazy-bg-image' data-background="https://picsum.photos/seed/154047/1600/900"></div>
-      </a>
-      
-      <div class="excerpt-container">
-        <div class="excerpt-meta">
-          <span class="date">  · 2022-03-31 ·</span> <span> / </span>
-          <span class="author">
-              <a href="https://eiun.github.io" title="Posts by  Eiun" rel="author"> Eiun</a>
-          </span>
-            
-                <span> / </span>
-                <span class="category">
-                        <a href="https://eiun.github.io/tag/ymhtHghCa/">Android</a>
-                </span>
-            
+  <div id="main" class="main" role="main">
+    <div id="loop-container" class="loop-container">
+      <div class="post type-post status-publish format-standard has-post-thumbnail hentry category-design tag-design tag-standard-2 tag-tagalicious tag-travel entry full-without-featured odd excerpt-1">
+        
 
+        <div class="entry-meta">
+          <span class="date">· 2022-03-31 ·</span> <span> / </span>
+          <span class="author">
+            <a href="https://eiun.github.io" title="" rel="author"> Eiun</a>
+          </span>
+          
         </div>
-        <div class='excerpt-header'>
-          <h2 class='excerpt-title'>
-            <a href="https://eiun.github.io/post/rao-guo-android-10-de-fan-she-xian-zhi-fang-fa/"> 绕过Android 10的反射限制方法 </a>
-          </h2>
+        <div class='entry-header'>
+          <h1 class='entry-title'>资源混淆使用说明</h1>
         </div>
-        <div class='excerpt-content'>
-          <article>
+        <div class="entry-container">
+          <div class="entry-content">
+            <article>
+              <p>####工具：</p>
+<h4 id="1使用aabresguardjar包进行资源混淆">1.使用AabResGuard.jar包进行资源混淆</h4>
+<p>config.xml中为混淆的配置，需要注意白名单配置避免混淆三方包中的资源，否则可能会导致三方包找不到资源出问题。</p>
+<p>merge-duplicated-res为MD5重复的资源合并选项</p>
+<p>混淆完成后，当前目录下会生成base-duplicated.txt文件为重复资源目录表，resources-mapping.txt文件为混淆前后资源文件对照表，再次混淆需要删除这两个文件。</p>
+<p>混淆命令：</p>
+<pre><code>java -jar AabResGuard.jar obfuscate-bundle --bundle=C:\Users\admin\Desktop\test\aab资源混淆\11.aab --output=C:\Users\admin\Desktop\test\aab资源混淆\22.aab --config=config.xml --merge-duplicated-res=true 
+</code></pre>
+<p>命令开始后需按确认键继续执行。</p>
+<h4 id="2aab解析成apk命令">2.aab解析成apk命令：</h4>
+<p>使用bundletool.jar包将aab包的格式解析成apks的格式，供后续手机安装使用。</p>
+<pre><code>java -jar bundletool.jar build-apks --bundle=C:\Users\admin\Desktop\test\aab资源混淆\22.aab --output=C:\Users\admin\Desktop\test\aab资源混淆\bb.apks --ks=C:\Users\admin\Desktop\test.jks --ks-key-alias=key0
+</code></pre>
+<p>aab解析成apk后安装命令：</p>
+<pre><code>java -jar bundletool.jar install-apks --apks=C:\Users\admin\Desktop\test\aab资源混淆\bb.apks
+</code></pre>
+
+            </article>
+          </div>
+          <div class='entry-meta-bottom'>
+            <div class="entry-categories">
+              <p>
+                <span>Categories</span>
+                
+                  
+                    
+                  <a href="https://eiun.github.io/tag/ymhtHghCa/" title="View all posts in Android">Android</a>
+                    
+                    
+              </p>
+            </div>
+            <div class="entry-tags">
+              <p><span>Tags</span>
+              </p>
+            </div>
+          </div>
+          <div class="author-meta">
+            <div class="author">
+              <img alt='' src="https://eiun.github.io/images/avatar.png?v=1648712947239" class='avatar avatar-72 photo' height='72' width='72'>
+              <span>WRITTEN BY: &nbsp;&nbsp;&nbsp;<a href='https://eiun.github.io'></a> </span>
+            </div>
+            <div class="bio">
+              <p></p>
               
-          </article>
+                
+              
+                
+              
+                
+              
+                
+              
+                
+              
+                
+              
+                
+              
+            </div>
+          </div>
         </div>
+          
       </div>
+      <section id="comments" class="comments">
+        
+      </section>
     </div>
   </div>
-  
-  <div id="loop-container" class="loop-container">
-    <div class="post type-post status-publish format-standard   has-post-thumbnail hentry category-design tag-memories
-    tag-normal-post tag-standard-2 excerpt zoom full-without-featured
-      
-        odd
-       excerpt">
-      
-      <a class="featured-image-link" href="https://eiun.github.io/post/webview-nei-cun-xie-lou-yan-jiu/">
-        <div class='featured-image lazy lazy-bg-image' data-background="https://picsum.photos/seed/151413/1600/900"></div>
-      </a>
-      
-      <div class="excerpt-container">
-        <div class="excerpt-meta">
-          <span class="date">  · 2022-03-31 ·</span> <span> / </span>
-          <span class="author">
-              <a href="https://eiun.github.io" title="Posts by  Eiun" rel="author"> Eiun</a>
-          </span>
-            
-                <span> / </span>
-                <span class="category">
-                        <a href="https://eiun.github.io/tag/ymhtHghCa/">Android</a>
-                </span>
-            
 
-        </div>
-        <div class='excerpt-header'>
-          <h2 class='excerpt-title'>
-            <a href="https://eiun.github.io/post/webview-nei-cun-xie-lou-yan-jiu/"> WebView内存泄漏研究 </a>
-          </h2>
-        </div>
-        <div class='excerpt-content'>
-          <article>
-              
-          </article>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-</div>
-
-        <nav class="navigation pagination" role="navigation">
-    <h2 class="screen-reader-text">Posts navigation</h2>
-    <div class="nav-links">
-        
-        
-    </div>
-</nav>
-
-        <footer id="site-footer" class="site-footer" role="contentinfo">
+  <footer id="site-footer" class="site-footer" role="contentinfo">
     <h1>
         <a href="https://eiun.github.io"> Eiun </a>
     </h1>
@@ -234,7 +230,7 @@
 <script src="https://eiun.github.io/media/scripts/lib/jquery.min.js"></script>
 <script src="https://eiun.github.io/media/scripts/lib/jquerymigrate.js"></script>
 <script src="https://eiun.github.io/media/scripts/lib/production.min.js"></script>
-      </div>
-  </body>
+</div>
+</body>
 </html>
 
