@@ -1,0 +1,452 @@
+<html>
+<head>
+  <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="all,follow">
+<meta name="googlebot" content="index,follow,snippet,archive">
+<title>WebView内存泄漏研究 | Eiun</title>
+<link rel="shortcut icon" href="https://eiun.github.io/favicon.ico?v=1649317411776">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+<link rel="stylesheet" href="https://eiun.github.io/styles/main.css" type='text/css' media='all'>
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+
+
+
+</head>
+<body class="home blog ct-body standard">
+<div id="overflow-container" class="overflow-container">
+  <a class="skip-content" href="#main">Skip to content</a>
+  <header id="site-header" class="site-header" role="banner">
+    <div class='top-navigation top-navigation-important'>
+        <div class='container'>
+            <div id="menu-secondary" class="menu-container menu-secondary" role="navigation">
+                <button id="toggle-secondary-navigation" class="toggle-secondary-navigation"><i class="fa fa-plus"></i></button>
+                <div class="menu">
+                    <ul id="menu-secondary-items" class="menu-secondary-items">
+                        
+                        
+                            
+                        <li id="menu-item" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item">
+                            <a href="https://eiun.github.io/tag/DesignPattern/">DesignPattern</a>
+                        </li>
+                            
+                        
+                            
+                        <li id="menu-item" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item">
+                            <a href="https://eiun.github.io/tag/CrashRecord/">CrashRecord</a>
+                        </li>
+                            
+                        
+                            
+                        <li id="menu-item" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item">
+                            <a href="https://eiun.github.io/tag/Android/">Android</a>
+                        </li>
+                            
+                        
+                    </ul>
+                </div>
+            </div>
+            <ul class="social-media-icons">
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="title-info" class="title-info">
+            <div id='site-title' class='site-title'>
+                <a href="/https://eiun.github.io">  Eiun </a>
+            </div>
+        </div>
+        <button id="toggle-navigation" class="toggle-navigation">
+            <i class="fa fa-bars"></i>
+        </button>
+        <div id="menu-primary-tracks" class="menu-primary-tracks"></div>
+        <div id="menu-primary" class="menu-container menu-primary" role="navigation">
+            <p class="site-description">温故而知新</p>
+            <div class="menu">
+                <ul id="menu-primary-items" class="menu-primary-items">
+                     
+                        
+                            <li id="menu-item" class='menu-item menu-item-type-post_type menu-item-object-page current-menu-item current_page_item'>
+                                <a href="/tag/Android">Android</a>
+                            </li>
+                        
+                    
+                        
+                            <li id="menu-item" class='menu-item menu-item-type-post_type menu-item-object-page current-menu-item current_page_item'>
+                                <a href="/tag/DesignPattern">架构设计</a>
+                            </li>
+                        
+                    
+                        
+                            <li id="menu-item" class='menu-item menu-item-type-post_type menu-item-object-page current-menu-item current_page_item'>
+                                <a href="/tag/CrashRecord">异常记录</a>
+                            </li>
+                        
+                    
+                        
+                            <li id="menu-item" class='menu-item menu-item-type-post_type menu-item-object-page current-menu-item current_page_item'>
+                                <a href="/post/about">关于</a>
+                            </li>
+                        
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+</header>
+
+  <div id="main" class="main" role="main">
+    <div id="loop-container" class="loop-container">
+      <div class="post type-post status-publish format-standard has-post-thumbnail hentry category-design tag-design tag-standard-2 tag-tagalicious tag-travel entry full-without-featured odd excerpt-1">
+        
+          <div class='featured-image lazy lazy-bg-image' data-background="https://picsum.photos/seed/151413/1600/900">
+          </div>
+        
+
+        <div class="entry-meta">
+          <span class="date">· 2022-03-31 ·</span> <span> / </span>
+          <span class="author">
+            <a href="https://eiun.github.io" title="" rel="author"> 谢谢惠顾~</a>
+          </span>
+          
+            <span class="category">
+                    <span> / </span>
+                    <a href="https://eiun.github.io/tag/Android/">Android</a>
+                </span>
+          
+        </div>
+        <div class='entry-header'>
+          <h1 class='entry-title'>WebView内存泄漏研究</h1>
+        </div>
+        <div class="entry-container">
+          <div class="entry-content">
+            <article>
+              <h1 id="概述">概述</h1>
+<p>一直听说 WebView 使用不当容易造成内存泄漏，网上有很多针对内存泄漏的解决方案，比较多的是在 Activity.onDestroy 的时候将 WebView 从 View 树中移除，然后再调用 WebView.destroy 方法：</p>
+<pre><code class="language-Kotlin">override fun onDestroy() {
+    val parent = webView?.parent
+    if (parent is ViewGroup) {
+        parent.removeView(webView)
+    }
+    webView?.destroy()
+    super.onDestroy()
+}
+
+</code></pre>
+<p>于是我写了一个简单的包含一个 WebView 的 Activity，然后在 Activity.onDestroy 中分别尝试 <strong>啥也不干</strong> 和 <strong>只调用 WebView.destroy</strong> 方法，接着项目里面集成了 leakcanary 用来检测内存泄漏，启动 App 后，反复横屏竖屏，发现 Activity.onDestroy 有被正常调用，但是 leakcanary 并没有提示有内存泄漏，因此猜想 WebView 高版本应该把这个问题修复了。我用的测试机是 Android 9 版本的，于是想着换个低版本的机型试试，就弄了个 Android 6 的手机一跑，发现还是没有发生内存泄漏，看了下网上这些讲 WebView 内存泄漏的文章，有的还是 2019 年的，既然都 2019 年了还在谈 WebView 会造成内存泄漏，那感觉 Android 6 的机型不应该表现正常呀，一脸懵逼。。。秉着不弄明白不罢休的原则，遇到这种问题好办，<code>Read The Fucking Source Code</code> 就完事了。</p>
+<h1 id="webview销毁时做了什么">WebView销毁时做了什么</h1>
+<p>既然网上的解决方案说先调用 removeView 移除 WebView，然后再调用 WebView.destroy 方法，那想着内存泄漏应该可以从 onDetachedFromWindow(从 Window 中 detach) 和 destroy(销毁) 这两个逻辑里找原因，看一下 WebView 中的这两个方法：</p>
+<pre><code class="language-Java">public void destroy() {
+    checkThread();
+    mProvider.destroy();
+}
+
+protected void onDetachedFromWindowInternal() {
+    mProvider.getViewDelegate().onDetachedFromWindow();
+    super.onDetachedFromWindowInternal();
+}
+
+</code></pre>
+<p>一般而言 destroy 方法应该在 Activity.onDestroy 时手动调用，而 onDetachedFromWindowInternal 方法在 View detach 的时候会由系统回调。注意 onDestroy 的调用时机早于 onDetachedFromWindow，相关的源码可以参考 <a href="https://juejin.cn/post/6898525503960186887">Android图形系统综述</a> 中 View 系列的文章自行跟踪。</p>
+<p>上面这两个方法都出现了一个叫 mProvider 的对象，这个对象是啥呢？在 WebView.java 中搜索了一下 <code>mProvider =</code>发现只有一处赋值：</p>
+<pre><code class="language-Java">private WebViewProvider mProvider;
+
+mProvider = getFactory().createWebView(this, new PrivateAccess());
+
+</code></pre>
+<p>它是一个 WebViewProvider 类型的实例，接着看它是怎么被赋值的，首先看一看 getFactory 返回的工厂对象是什么：</p>
+<pre><code class="language-Java">private static WebViewFactoryProvider getFactory() {
+    return WebViewFactory.getProvider();
+}
+
+// WebViewFactory
+static WebViewFactoryProvider getProvider() {
+    if (sProviderInstance != null) return sProviderInstance;
+    Class&lt;WebViewFactoryProvider&gt; providerClass = getProviderClass();
+    // CHROMIUM_WEBVIEW_FACTORY_METHOD = &quot;create&quot;
+    staticFactory = providerClass.getMethod(CHROMIUM_WEBVIEW_FACTORY_METHOD, WebViewDelegate.class);
+    sProviderInstance = (WebViewFactoryProvider) staticFactory.invoke(null, new WebViewDelegate());
+    return sProviderInstance;
+}
+
+</code></pre>
+<p>上面的 WebViewFactory.getProvider() 方法看上去是通过调用 providerClass 中的 create 方法拿到了 sProviderInstance 实例，于是得继续看 getProviderClass 方法到底是返回了一个什么类型的类：</p>
+<pre><code class="language-Java">private static Class&lt;WebViewFactoryProvider&gt; getProviderClass() {
+    // ...
+    return getWebViewProviderClass(clazzLoader);
+}
+
+public static Class&lt;WebViewFactoryProvider&gt; getWebViewProviderClass(ClassLoader clazzLoader) throws ClassNotFoundException {
+    return (Class&lt;WebViewFactoryProvider&gt;) Class.forName(CHROMIUM_WEBVIEW_FACTORY, true, clazzLoader);
+}
+
+</code></pre>
+<p>查看源码，可以发现 CHROMIUM_WEBVIEW_FACTORY 取值为 <code>com.android.webview.chromium.WebViewChromiumFactoryProviderForP</code>，我查看的源码版本是 Android P 的，所以这里是 WebViewChromiumFactoryProviderForP，看了一下其它 Android 版本的源码，发现都有一个对应的 WebViewChromiumFactoryProviderForX 值。这个 WebViewChromiumFactoryProviderForP 类在 AOSP 中是没有的，那应该去哪里找呢？</p>
+<p>参考 Chrome developer 的文档: <a href="https://developer.chrome.com/multidevice/webview/overview">WebView for Android</a>，可以看到从 Android 4.4 开始，WebView 组件基于 Chromium open source project 项目，新的 Webview 与 Android 端的 Chrome 浏览器共享同样的渲染引擎，因此 WebView 和 Chrome 之间的渲染应该会更加一致。而从 Android 5.0(Lollipop) 版本开始将 WebView 迁移到了一个独立的 APK --- <strong>Android System WebView</strong>，因此可以单独在 Android 平台更新。这个 APP 可以在应用管理中看到，看到这里我大概明白了之前为啥用 Android 6 的机器也没有测试出内存泄漏，猜想应该是它的 <code>Android System WebView</code> 应用版本已经把内存泄漏的问题解决了吧，看了一下其应用版本是 <code>86.0.4240.198</code>(可以在应用管理中查看 <code>Android System WebView</code> 应用的版本，另外也可以在浏览器中打开这个 <a href="https://liulanmi.com/labs/core.html">网址</a> 也会显示版本)。于是我们验证一下这个猜想。</p>
+<p>关于 Chromium open source project 的源码可以在这里查看: <a href="https://chromium.googlesource.com/chromium/src.git/%2Brefs">Chromium open source project Ref</a>，在这里可以查看目标版本的源码，我选择 <code>86.0.4240.198</code> 版本的源码进行解析。接着上面的 <a href="https://chromium.googlesource.com/chromium/src.git/%2B/refs/tags/86.0.4240.198/android_webview/glue/java/src/com/android/webview/chromium/WebViewChromiumFactoryProviderForP.java">WebViewChromiumFactoryProviderForP</a> 开始：</p>
+<pre><code class="language-Java">public class WebViewChromiumFactoryProviderForP extends WebViewChromiumFactoryProvider {
+    public static WebViewChromiumFactoryProvider create(android.webkit.WebViewDelegate delegate) {
+        return new WebViewChromiumFactoryProviderForP(delegate);
+    }
+
+    protected WebViewChromiumFactoryProviderForP(android.webkit.WebViewDelegate delegate) {
+        super(delegate);
+    }
+}
+
+</code></pre>
+<p>可以看到返回了一个 WebViewChromiumFactoryProviderForP 实例，其 createWebView 方法在父类 <a href="https://chromium.googlesource.com/chromium/src.git/%2B/refs/tags/86.0.4240.198/android_webview/glue/java/src/com/android/webview/chromium/WebViewChromiumFactoryProvider.java">WebViewChromiumFactoryProvider</a> 中：</p>
+<pre><code class="language-Java">public WebViewProvider createWebView(WebView webView, WebView.PrivateAccess privateAccess) {
+    return new WebViewChromium(this, webView, privateAccess, mShouldDisableThreadChecking);
+}
+
+</code></pre>
+<p>因此上面的 mProvider 是 <a href="https://chromium.googlesource.com/chromium/src.git/%2B/refs/tags/86.0.4240.198/android_webview/glue/java/src/com/android/webview/chromium/WebViewChromium.java">WebViewChromium</a> 实例，来看一下它的 onDetachedFromWindow 和 destroy 方法：</p>
+<pre><code class="language-Java">public WebViewProvider.ViewDelegate getViewDelegate() {
+    return this;
+}
+
+public void onDetachedFromWindow() {
+    // ...
+    mAwContents.onDetachedFromWindow();
+}
+
+public void destroy() {
+    // ...
+    mAwContents.destroy();
+}
+
+</code></pre>
+<p>这俩都会调用到 AwContents 中对应的方法，所以上面 WebView 销毁的时候，其 destroy 和 onDetachedFromWindowInternal 方法最后会调用到 AwContents 中对应的方法，低版本的内存泄漏就发生在这里。</p>
+<h1 id="awcontents中的内存泄漏">AwContents中的内存泄漏</h1>
+<p>我们先看一下 mAwContents 的创建：</p>
+<pre><code class="language-Java">mAwContents = new AwContents(mFactory.getBrowserContextOnUiThread(), mWebView, mContext, ...);
+
+</code></pre>
+<h2 id="8604240198版本">86.0.4240.198版本</h2>
+<p>首先看看 <code>86.0.4240.198</code> 版本中的 <a href="https://chromium.googlesource.com/chromium/src.git/%2B/refs/tags/86.0.4240.198/android_webview/java/src/org/chromium/android_webview/AwContents.java">AwContents</a> 类中的几个相关方法：</p>
+<pre><code class="language-Java">public void destroy() {
+    if (isDestroyed(NO_WARN)) return;
+    // ...
+    // Remove pending messages
+    mContentsClient.getCallbackHelper().removeCallbacksAndMessages();
+    if (mIsAttachedToWindow) {
+        // 如果此时没有 detach 则先调用 onDetachedFromWindow 方法，然后才将 mIsDestroyed 置为 true
+        Log.w(TAG, &quot;WebView.destroy() called while WebView is still attached to window.&quot;);
+        onDetachedFromWindow();
+    }
+    mIsDestroyed = true;
+}
+
+// onAttachedToWindow 时会调用
+public void onAttachedToWindow() {
+    if (isDestroyed(NO_WARN)) return;
+    if (mIsAttachedToWindow) {
+        Log.w(TAG, &quot;onAttachedToWindow called when already attached. Ignoring&quot;);
+        return;
+    }
+    mIsAttachedToWindow = true;
+    // ...
+    if (mComponentCallbacks != null) return;
+    mComponentCallbacks = new AwComponentCallbacks();
+    // 注册 ComponentCallbacks
+    mContext.registerComponentCallbacks(mComponentCallbacks);
+}
+
+// onDetachedFromWindow 时会调用
+public void onDetachedFromWindow() {
+    if (isDestroyed(NO_WARN)) return;
+    if (!mIsAttachedToWindow) {
+        Log.w(TAG, &quot;onDetachedFromWindow called when already detached. Ignoring&quot;);
+        return;
+    }
+    mIsAttachedToWindow = false;
+    // ...
+    if (mComponentCallbacks != null) {
+        // 将 ComponentCallbacks 解注册
+        mContext.unregisterComponentCallbacks(mComponentCallbacks);
+        mComponentCallbacks = null;
+    }
+}
+
+</code></pre>
+<p>在 View attach 到 Window 中的时候会调用上面的 onAttachedToWindow 方法，在 View detach 的时候会调用到 onDetachedFromWindow 方法，这两个方法中调用了一个 registerComponentCallbacks 和 unregisterComponentCallbacks 函数分别注册和解注册了一个 Callback，低版本会发生内存泄漏的原因就在此！</p>
+<p>所以我们再来看一下 ComponentCallbacks 相关的逻辑：</p>
+<pre><code class="language-Java">// Context
+public void registerComponentCallbacks(ComponentCallbacks callback) {
+    getApplicationContext().registerComponentCallbacks(callback);
+}
+
+// Application
+public void registerComponentCallbacks(ComponentCallbacks callback) {
+    synchronized (mComponentCallbacks) {
+        mComponentCallbacks.add(callback);
+    }
+}
+
+</code></pre>
+<p>所以假设在 AwContents 中只调用了 registerComponentCallbacks 注册方法而没有调用 unregisterComponentCallbacks 方法来解注册，那么会出现什么情况呢？<strong>我们看一下这个 AwComponentCallbacks 类的实现，发现它是 AwContents 中的一个非静态内部类，因此它会持有外部 AwContents 实例的引用，而 AwContents 持有 WebView 的 Context 上下文，对于 xml 中的 WebView 布局而言，这个上下文就是其所在的 Activity，因此如果在 Activity 生命周期结束后没有调用 unregisterComponentCallbacks 方法解注册的话，便可能会发生内存泄漏</strong>。</p>
+<p>在 <code>86.0.4240.198</code> 版本中，如果在 Activity.onDestroy 方法中啥也不干，那么在 View detach 的时候依旧会调用 unregisterComponentCallbacks 方法解注册；而如果在 Activity.onDestroy 方法中只手动调用了 WebView.destroy 方法，那么还是会先通过调用 onDetachedFromWindow 来解注册，此时的 <code>if (isDestroyed(NO_WARN)) return;</code> 判断是 false，可以正常执行到解注册的逻辑，然后才会标记为已销毁。</p>
+<h2 id="54028051版本">54.0.2805.1版本</h2>
+<p>接着我们再看一个旧版本 <code>54.0.2805.1</code> 中的 <a href="https://chromium.googlesource.com/chromium/src.git/%2B/refs/tags/54.0.2805.1/android_webview/java/src/org/chromium/android_webview/AwContents.java">AwContents</a> 这几个方法：</p>
+<pre><code class="language-Java">public void destroy() {
+    if (isDestroyed(NO_WARN)) return;
+    // Remove pending messages
+    mContentsClient.getCallbackHelper().removeCallbacksAndMessages();
+    // ...
+    if (mIsAttachedToWindow) {
+        Log.w(TAG, &quot;WebView.destroy() called while WebView is still attached to window.&quot;);
+        nativeOnDetachedFromWindow(mNativeAwContents);
+    }
+    mIsDestroyed = true;
+}
+
+public void onAttachedToWindow() {
+    if (isDestroyed(NO_WARN)) return;
+    // ...
+    if (mComponentCallbacks != null) return;
+    mComponentCallbacks = new AwComponentCallbacks();
+    mContext.registerComponentCallbacks(mComponentCallbacks);
+}
+
+public void onDetachedFromWindow() {
+    if (isDestroyed(NO_WARN)) return;
+    nativeOnDetachedFromWindow(mNativeAwContents);
+    // ...
+    if (mComponentCallbacks != null) {
+        mContext.unregisterComponentCallbacks(mComponentCallbacks);
+        mComponentCallbacks = null;
+    }
+}
+
+</code></pre>
+<p>可以看到如果在 Activity.onDestroy 中只调用了 WebView.destroy 方法的话，那么此时还没有调用到 onDetachedFromWindow 方法去解注册，却已经将 mIsDestroyed 置为了 true，于是当 detach 的时候，onDetachedFromWindow 判断到 isDestroyed 为 true 则不会走接下来解注册的逻辑了，于是内存泄漏也随之而来。</p>
+<p>而如果在 Activity.onDestroy 中不手动调用 WebView.destroy 的话，理论上在 WebView detach 的时候能调用 onDetachedFromWindow 方法解注册 Callback，那么这个内存泄漏问题应该不会发生，但是没有调用 WebView.destroy 方法的话，很可能会发生其它问题，比如说不会调用 <code>mContentsClient.getCallbackHelper().removeCallbacksAndMessages()</code> 去移除 pending 的消息，说不定又有新的内存泄漏之类的。。。</p>
+<p>要测试低版本 Chromium 的内存泄漏，可以找一个低版本的 Android 手机，然后将其 <code>Android System WebView</code> 应用卸载到装机版本，然后查看对应版本的 AwContents 类源码，如果源码中有内存泄漏的可能的话就可以测试了。另外如果手里头有 Root 的手机，可以尝试将 <code>Android System WebView</code> 最新版卸载，然后在 <a href="https://www.apkmirror.com/apk/google-inc/android-system-webview/">apkmirror</a> 中下载一个低版本的 <code>Android System WebView</code> APK 安装到手机上；或者直接从源码中编译出一个指定版本的 <code>Android System WebView</code> 应用，源码编译时间有限我也没试过，可以参考 <a href="https://chromium.googlesource.com/chromium/src/%2B/HEAD/android_webview/docs/build-instructions.md">build-instructions</a>。</p>
+<h1 id="总结">总结</h1>
+<p>WebView 中的内存泄漏其实与 Chromium 内核版本有关，在新版本的 Chromium 内核中内存泄漏问题已经被解决了，而且从 Android 5.0(Lollipop) 版本开始将 Chromium WebView 迁移到了一个独立的 APP -- <code>Android System WebView</code>，随着 <code>Android System WebView</code> 的独立发布，低版本 Android 系统(Android 5以上)上搭载的 Chromium 内核一般来说也不会太旧，所以出现内存泄漏的概率应该是比较小的。如果仍需要兼容这很小的一部分机型，可以通过文章开头的方式销毁 WebView，即先移除 WebView 组件，确保先调用到 onDetachedFromWindow 方法解注册，然后再通过 WebView.destroy 方法处理其它销毁逻辑。</p>
+
+            </article>
+          </div>
+          <div class='entry-meta-bottom'>
+            <div class="entry-categories">
+              <p>
+                <span>Categories</span>
+                
+                  
+                    
+                  <a href="https://eiun.github.io/tag/DesignPattern/" title="View all posts in DesignPattern">DesignPattern</a>
+                    
+                    
+                    
+                  <a href="https://eiun.github.io/tag/CrashRecord/" title="View all posts in CrashRecord">CrashRecord</a>
+                    
+                    
+                    
+                  <a href="https://eiun.github.io/tag/Android/" title="View all posts in Android">Android</a>
+                    
+                    
+              </p>
+            </div>
+            <div class="entry-tags">
+              <p><span>Tags</span>
+              </p>
+            </div>
+          </div>
+<!--           <div class="author-meta"> -->
+<!--             <div class="author"> -->
+<!--               <img alt='' src="https://eiun.github.io/images/avatar.png?v=1649317411776" class='avatar avatar-72 photo' height='72' width='72'> -->
+<!--               <span>WRITTEN BY: &nbsp;&nbsp;&nbsp;<a href='https://eiun.github.io'></a> </span> -->
+<!--             </div> -->
+<!--             <div class="bio"> -->
+<!--               <p></p> -->
+<!--                -->
+<!--                  -->
+<!--                -->
+<!--                  -->
+<!--                -->
+<!--                  -->
+<!--                -->
+<!--                  -->
+<!--                -->
+<!--                  -->
+<!--                -->
+<!--                  -->
+<!--                -->
+<!--                  -->
+<!--                -->
+<!--             </div> -->
+<!--           </div> -->
+<!--         </div> -->
+          
+      </div>
+      <section id="comments" class="comments">
+        
+      </section>
+    </div>
+  </div>
+
+  <footer id="site-footer" class="site-footer" role="contentinfo">
+    <h1>
+        <a href="https://eiun.github.io"> Eiun </a>
+    </h1>
+    <p class="site-description">温故而知新</p>
+    <div id="menu-footer" class="menu-container menu-footer" role="navigation">
+        <div class="menu">
+            <ul id="menu-footer-items" class="menu-footer-items">
+            </ul>
+        </div>
+    </div>
+    <ul class="social-media-icons">
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </ul>
+    <div class="design-credit">
+        <p>谢谢惠顾~</p>
+    </div>
+</footer>
+<script>
+    hljs.initHighlightingOnLoad()
+</script>
+<script src="https://eiun.github.io/media/scripts/lib/jquery.min.js"></script>
+<script src="https://eiun.github.io/media/scripts/lib/jquerymigrate.js"></script>
+<script src="https://eiun.github.io/media/scripts/lib/production.min.js"></script>
+</div>
+</body>
+</html>
+

@@ -1,11 +1,11 @@
 <html>
 <head>
-    <meta charset="utf-8" />
+  <meta charset="utf-8" />
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="all,follow">
 <meta name="googlebot" content="index,follow,snippet,archive">
-<title>Eiun</title>
+<title>设计模式-责任链模式(Chain of responsibility) | Eiun</title>
 <link rel="shortcut icon" href="https://eiun.github.io/favicon.ico?v=1649317411776">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 <link rel="stylesheet" href="https://eiun.github.io/styles/main.css" type='text/css' media='all'>
@@ -17,10 +17,10 @@
 
 
 </head>
-    <body class="post-template-default single single-post single-format-standard ct-body singular singular-post not-front standard">
-        <div id="overflow-container" class="overflow-container">
-            <a class="skip-content" href="#main">Skip to content</a>
-                <header id="site-header" class="site-header" role="banner">
+<body class="home blog ct-body standard">
+<div id="overflow-container" class="overflow-container">
+  <a class="skip-content" href="#main">Skip to content</a>
+  <header id="site-header" class="site-header" role="banner">
     <div class='top-navigation top-navigation-important'>
         <div class='container'>
             <div id="menu-secondary" class="menu-container menu-secondary" role="navigation">
@@ -117,75 +117,143 @@
 
 </header>
 
-                
+  <div id="main" class="main" role="main">
+    <div id="loop-container" class="loop-container">
+      <div class="post type-post status-publish format-standard has-post-thumbnail hentry category-design tag-design tag-standard-2 tag-tagalicious tag-travel entry full-without-featured odd excerpt-1">
+        
 
-<div class="main">
-    <div class="main-content">
-        <div id="timeline-container">
-            <div id="timeline">
-                
-                <div class="timeline-item">
-                    <div class="timeline-icon">
-    <!--                    <img src="assets/images/star.svg" alt="2022">-->
-                        <span>2022</span>
-                    </div>
-                    
-                    
-                        <div class="timeline-content">
-                            <h3 class="timeline-title"> 设计模式-责任链模式(Chain of responsibility)</h3>
-                            <p>
-                                
-                            </p>
-                            <a href="https://eiun.github.io/she-ji-mo-shi-ze-ren-lian-mo-shi-chain-of-responsibility/" class="btn">review</a>
-                        </div>
-                    
-                    
-                    
-                        <div class="timeline-content">
-                            <h3 class="timeline-title"> 异常记录-String.format</h3>
-                            <p>
-                                
-                            </p>
-                            <a href="https://eiun.github.io/yi-chang-ji-lu-stringformat/" class="btn">review</a>
-                        </div>
-                    
-                    
-                    
-                        <div class="timeline-content">
-                            <h3 class="timeline-title"> 绕过Android 10的反射限制方法</h3>
-                            <p>
-                                
-                            </p>
-                            <a href="https://eiun.github.io/rao-guo-android-10-de-fan-she-xian-zhi-fang-fa/" class="btn">review</a>
-                        </div>
-                    
-                    
-                    
-                        <div class="timeline-content">
-                            <h3 class="timeline-title"> WebView内存泄漏研究</h3>
-                            <p>
-                                
-                            </p>
-                            <a href="https://eiun.github.io/webview-nei-cun-xie-lou-yan-jiu/" class="btn">review</a>
-                        </div>
-                    
-                    
-                </div>
-                 
-            </div>
+        <div class="entry-meta">
+          <span class="date">· 2022-04-07 ·</span> <span> / </span>
+          <span class="author">
+            <a href="https://eiun.github.io" title="" rel="author"> 谢谢惠顾~</a>
+          </span>
+          
+            <span class="category">
+                    <span> / </span>
+                    <a href="https://eiun.github.io/tag/DesignPattern/">DesignPattern</a>
+                </span>
+          
         </div>
-    </div>
-</div>
+        <div class='entry-header'>
+          <h1 class='entry-title'>设计模式-责任链模式(Chain of responsibility)</h1>
+        </div>
+        <div class="entry-container">
+          <div class="entry-content">
+            <article>
+              <p>定义及使用场景<br>
+使多个对象都有机会处理请求，从而避免了请求的发送者和接受者之间的耦合关系，将这些对象连成一条链，并沿着这条链传递该请求，一直到有对象处理它为止</p>
+<p>UML图<br>
+责任链模式UML图<br>
+<img src="https://eiun.github.io/post-images/1649314468592.png" alt="" loading="lazy"><br>
+Handler<br>
+抽象处理者角色，声明一个请求处理的方法，并在其中保持一个对下一个处理节点Handler对象的引用<br>
+ConcreteHandler<br>
+具体处理者角色，对请求进行处理，如果不能处理则将该请求转发给下一个节点上的处理对象</p>
+<p>我的实际应用<br>
+在webview中的注入js方法<br>
+abstract class JsProvider {}<br>
+class AppJsProvider : JsProvider() {}<br>
+class CustomJsProvider : JsProvider() {}<br>
+class JSBridger constructor(jsProvider: JsProvider) {<br>
+//责任链是一个链表<br>
+//指向下一个链表的节点<br>
+var successor: JSBridger? = null<br>
+//此方法也可以抽象出来，让实现类判断是否可处理当前事件<br>
+fun handleRequest(data:Data）{<br>
+if(canDo){<br>
+doSomeThing()<br>
+}else{<br>
+//交给下一个节点处理<br>
+successor?.handleRequest(data)<br>
+}<br>
+}<br>
+}</p>
+<p>class CustomWebView(context: Context) : WebView(context) {<br>
+protected JSBridger mJsBridge = JSBridger(AppJsProvider())<br>
+private var mLastJSBridger: JSBridger? = null<br>
+@Synchronized<br>
+fun addJsProvider(jsProvider: JsProvider) {<br>
+//构建链表<br>
+if (mLastJSBridger == null) {<br>
+mLastJSBridger = mJsBridge<br>
+}<br>
+val jsBridger = JSBridger(jsProvider)<br>
+mLastJSBridger?.successor = jsBridger<br>
+mLastJSBridger = jsBridger<br>
+}<br>
+}</p>
+<p>源码中的例子<br>
+责任链模式在Android源码中比较类似的实现莫过于对事件的分发处理，每当用户接触屏幕时，Android都会将对应的事件包装成一个事件对象从ViewTree的顶部至上而下地分发传递。<br>
+ViewGroup事件投递的递归调用就类似于一条责任链，一旦其寻找到责任者，那么将由责任者持有并消费掉该次事件，具体地体现在View的onTouchEvent方法中返回值的设置，如果onTouchEvent返回false，那么意味着当前View不会是该次事件的责任人，将不会对其持有；如果为true则相反，此时View会持有该事件并不再向外传递。</p>
 
-                <nav class="navigation pagination" role="navigation">
-    <h2 class="screen-reader-text">Posts navigation</h2>
-    <div class="nav-links">
+            </article>
+          </div>
+          <div class='entry-meta-bottom'>
+            <div class="entry-categories">
+              <p>
+                <span>Categories</span>
+                
+                  
+                    
+                  <a href="https://eiun.github.io/tag/DesignPattern/" title="View all posts in DesignPattern">DesignPattern</a>
+                    
+                    
+                    
+                  <a href="https://eiun.github.io/tag/CrashRecord/" title="View all posts in CrashRecord">CrashRecord</a>
+                    
+                    
+                    
+                  <a href="https://eiun.github.io/tag/Android/" title="View all posts in Android">Android</a>
+                    
+                    
+              </p>
+            </div>
+            <div class="entry-tags">
+              <p><span>Tags</span>
+              </p>
+            </div>
+          </div>
+<!--           <div class="author-meta"> -->
+<!--             <div class="author"> -->
+<!--               <img alt='' src="https://eiun.github.io/images/avatar.png?v=1649317411776" class='avatar avatar-72 photo' height='72' width='72'> -->
+<!--               <span>WRITTEN BY: &nbsp;&nbsp;&nbsp;<a href='https://eiun.github.io'></a> </span> -->
+<!--             </div> -->
+<!--             <div class="bio"> -->
+<!--               <p></p> -->
+<!--                -->
+<!--                  -->
+<!--                -->
+<!--                  -->
+<!--                -->
+<!--                  -->
+<!--                -->
+<!--                  -->
+<!--                -->
+<!--                  -->
+<!--                -->
+<!--                  -->
+<!--                -->
+<!--                  -->
+<!--                -->
+<!--             </div> -->
+<!--           </div> -->
+<!--         </div> -->
+          
+            <nav class="navigation pagination" role="navigation">
+              <h2 class="screen-reader-text">Posts navigation</h2>
+              <div class="nav-links">
+                <a class="next page-numbers" href="https://eiun.github.io/yi-chang-ji-lu-stringformat/">下一篇->异常记录-String.format</a>
+              </div>
+            </nav>
+          
+      </div>
+      <section id="comments" class="comments">
         
-        
+      </section>
     </div>
-</nav>
+  </div>
 
-                <footer id="site-footer" class="site-footer" role="contentinfo">
+  <footer id="site-footer" class="site-footer" role="contentinfo">
     <h1>
         <a href="https://eiun.github.io"> Eiun </a>
     </h1>
@@ -223,6 +291,7 @@
 <script src="https://eiun.github.io/media/scripts/lib/jquery.min.js"></script>
 <script src="https://eiun.github.io/media/scripts/lib/jquerymigrate.js"></script>
 <script src="https://eiun.github.io/media/scripts/lib/production.min.js"></script>
-        </div>
-    </body>
+</div>
+</body>
 </html>
+

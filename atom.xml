@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://eiun.github.io</id>
     <title>Eiun</title>
-    <updated>2022-04-07T07:20:41.392Z</updated>
+    <updated>2022-04-07T07:44:11.543Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://eiun.github.io"/>
     <link rel="self" href="https://eiun.github.io/atom.xml"/>
@@ -12,29 +12,29 @@
     <rights>All rights reserved 2022, Eiun</rights>
     <entry>
         <title type="html"><![CDATA[设计模式-责任链模式(Chain of responsibility)]]></title>
-        <id>https://eiun.github.io/post/she-ji-mo-shi-ze-ren-lian-mo-shi-chain-of-responsibility/</id>
-        <link href="https://eiun.github.io/post/she-ji-mo-shi-ze-ren-lian-mo-shi-chain-of-responsibility/">
+        <id>https://eiun.github.io/she-ji-mo-shi-ze-ren-lian-mo-shi-chain-of-responsibility/</id>
+        <link href="https://eiun.github.io/she-ji-mo-shi-ze-ren-lian-mo-shi-chain-of-responsibility/">
         </link>
         <updated>2022-04-07T04:08:39.000Z</updated>
     </entry>
     <entry>
         <title type="html"><![CDATA[异常记录-String.format]]></title>
-        <id>https://eiun.github.io/post/yi-chang-ji-lu-stringformat/</id>
-        <link href="https://eiun.github.io/post/yi-chang-ji-lu-stringformat/">
+        <id>https://eiun.github.io/yi-chang-ji-lu-stringformat/</id>
+        <link href="https://eiun.github.io/yi-chang-ji-lu-stringformat/">
         </link>
         <updated>2022-04-06T06:52:40.000Z</updated>
     </entry>
     <entry>
         <title type="html"><![CDATA[绕过Android 10的反射限制方法]]></title>
-        <id>https://eiun.github.io/post/rao-guo-android-10-de-fan-she-xian-zhi-fang-fa/</id>
-        <link href="https://eiun.github.io/post/rao-guo-android-10-de-fan-she-xian-zhi-fang-fa/">
+        <id>https://eiun.github.io/rao-guo-android-10-de-fan-she-xian-zhi-fang-fa/</id>
+        <link href="https://eiun.github.io/rao-guo-android-10-de-fan-she-xian-zhi-fang-fa/">
         </link>
         <updated>2022-03-31T07:40:47.000Z</updated>
     </entry>
     <entry>
         <title type="html"><![CDATA[WebView内存泄漏研究]]></title>
-        <id>https://eiun.github.io/post/webview-nei-cun-xie-lou-yan-jiu/</id>
-        <link href="https://eiun.github.io/post/webview-nei-cun-xie-lou-yan-jiu/">
+        <id>https://eiun.github.io/webview-nei-cun-xie-lou-yan-jiu/</id>
+        <link href="https://eiun.github.io/webview-nei-cun-xie-lou-yan-jiu/">
         </link>
         <updated>2022-03-31T07:14:13.000Z</updated>
     </entry>
