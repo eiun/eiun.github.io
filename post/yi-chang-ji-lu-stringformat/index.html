@@ -1,11 +1,11 @@
 <html>
 <head>
-    <meta charset="utf-8" />
+  <meta charset="utf-8" />
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="all,follow">
 <meta name="googlebot" content="index,follow,snippet,archive">
-<title>Eiun</title>
+<title>异常记录-String.format | Eiun</title>
 <link rel="shortcut icon" href="https://eiun.github.io/favicon.ico?v=1649315986803">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 <link rel="stylesheet" href="https://eiun.github.io/styles/main.css" type='text/css' media='all'>
@@ -17,10 +17,10 @@
 
 
 </head>
-    <body class="post-template-default single single-post single-format-standard ct-body singular singular-post not-front standard">
-        <div id="overflow-container" class="overflow-container">
-            <a class="skip-content" href="#main">Skip to content</a>
-                <header id="site-header" class="site-header" role="banner">
+<body class="home blog ct-body standard">
+<div id="overflow-container" class="overflow-container">
+  <a class="skip-content" href="#main">Skip to content</a>
+  <header id="site-header" class="site-header" role="banner">
     <div class='top-navigation top-navigation-important'>
         <div class='container'>
             <div id="menu-secondary" class="menu-container menu-secondary" role="navigation">
@@ -105,75 +105,103 @@
 
 </header>
 
-                
+  <div id="main" class="main" role="main">
+    <div id="loop-container" class="loop-container">
+      <div class="post type-post status-publish format-standard has-post-thumbnail hentry category-design tag-design tag-standard-2 tag-tagalicious tag-travel entry full-without-featured odd excerpt-1">
+        
 
-<div class="main">
-    <div class="main-content">
-        <div id="timeline-container">
-            <div id="timeline">
-                
-                <div class="timeline-item">
-                    <div class="timeline-icon">
-    <!--                    <img src="assets/images/star.svg" alt="2022">-->
-                        <span>2022</span>
-                    </div>
-                    
-                    
-                        <div class="timeline-content">
-                            <h3 class="timeline-title"> 设计模式-责任链模式(Chain of responsibility)</h3>
-                            <p>
-                                
-                            </p>
-                            <a href="https://eiun.github.io/post/she-ji-mo-shi-ze-ren-lian-mo-shi-chain-of-responsibility/" class="btn">review</a>
-                        </div>
-                    
-                    
-                    
-                        <div class="timeline-content">
-                            <h3 class="timeline-title"> 异常记录-String.format</h3>
-                            <p>
-                                
-                            </p>
-                            <a href="https://eiun.github.io/post/yi-chang-ji-lu-stringformat/" class="btn">review</a>
-                        </div>
-                    
-                    
-                    
-                        <div class="timeline-content">
-                            <h3 class="timeline-title"> 绕过Android 10的反射限制方法</h3>
-                            <p>
-                                
-                            </p>
-                            <a href="https://eiun.github.io/post/rao-guo-android-10-de-fan-she-xian-zhi-fang-fa/" class="btn">review</a>
-                        </div>
-                    
-                    
-                    
-                        <div class="timeline-content">
-                            <h3 class="timeline-title"> WebView内存泄漏研究</h3>
-                            <p>
-                                
-                            </p>
-                            <a href="https://eiun.github.io/post/webview-nei-cun-xie-lou-yan-jiu/" class="btn">review</a>
-                        </div>
-                    
-                    
-                </div>
-                 
-            </div>
+        <div class="entry-meta">
+          <span class="date">· 2022-04-06 ·</span> <span> / </span>
+          <span class="author">
+            <a href="https://eiun.github.io" title="" rel="author"> Eiun</a>
+          </span>
+          
         </div>
-    </div>
-</div>
+        <div class='entry-header'>
+          <h1 class='entry-title'>异常记录-String.format</h1>
+        </div>
+        <div class="entry-container">
+          <div class="entry-content">
+            <article>
+              <p>java.util.UnknownFormatConversionException: Conversion = ‘p’</p>
+<p>String.format的字符串包含 % 号时必须使用规定的字符转换，使用未确定的字符会抛出异常，例如'p'的异常字符串为  “xxx%pxxxx”</p>
+<p>附表<br>
+转换符 	说明 	示例 	结果<br>
+%s	 字符串类型	String.format(“你好 %s”,“张三”)	你好 张三<br>
+%c	字符类型	String.format(&quot;%c %c %c&quot;,‘A’,‘B’,‘C’)	A B C<br>
+%b	布尔类型	String.format(&quot;%b&quot;,true)	true<br>
+%d	整数类型 (十进制)	String.format(“分数:%d”,99)	分数:99<br>
+%x	整数类型（十六进制）	String.format(“16进制:%x”,122) 	16进制:7a<br>
+%o	整数类型（八进制）	String.format(“8进制:%x”,122)	8进制:172<br>
+%f	浮点类型	String.format(“浮点类型:%f”,99.99)	99.990000<br>
+%a	16进制浮点类型 	String.format(“16进制浮点型：%a”,122.122)	 0x1.e87ced916872bp6<br>
+%e	指数类型	String.format(“指数类型:%e”,50<em>0.85)	 指数类型:4.250000e+01<br>
+%g	通用浮点类型(指数类型和浮点类型较短的是)	String.format(“指数类型和浮点型较短的是:%g”,50</em>0.85)	指数类型和浮点型较短的是:42.5000<br>
+%h	散列码	String.format(“A的散列码是:%h”,‘A’)	A的散列码是:41<br>
+%n	换行符号	 	 <br>
+%%	百分号	 String.format(“99%%”)	99%<br>
+%tx	日期与时间类型（x代表不同的日期与时间转换符 )</p>
 
-                <nav class="navigation pagination" role="navigation">
-    <h2 class="screen-reader-text">Posts navigation</h2>
-    <div class="nav-links">
+            </article>
+          </div>
+          <div class='entry-meta-bottom'>
+            <div class="entry-categories">
+              <p>
+                <span>Categories</span>
+                
+                  
+                    
+                  <a href="https://eiun.github.io/tag/ymhtHghCa/" title="View all posts in Android">Android</a>
+                    
+                    
+              </p>
+            </div>
+            <div class="entry-tags">
+              <p><span>Tags</span>
+              </p>
+            </div>
+          </div>
+<!--           <div class="author-meta"> -->
+<!--             <div class="author"> -->
+<!--               <img alt='' src="https://eiun.github.io/images/avatar.png?v=1649315986803" class='avatar avatar-72 photo' height='72' width='72'> -->
+<!--               <span>WRITTEN BY: &nbsp;&nbsp;&nbsp;<a href='https://eiun.github.io'></a> </span> -->
+<!--             </div> -->
+<!--             <div class="bio"> -->
+<!--               <p></p> -->
+<!--                -->
+<!--                  -->
+<!--                -->
+<!--                  -->
+<!--                -->
+<!--                  -->
+<!--                -->
+<!--                  -->
+<!--                -->
+<!--                  -->
+<!--                -->
+<!--                  -->
+<!--                -->
+<!--                  -->
+<!--                -->
+<!--             </div> -->
+<!--           </div> -->
+<!--         </div> -->
+          
+            <nav class="navigation pagination" role="navigation">
+              <h2 class="screen-reader-text">Posts navigation</h2>
+              <div class="nav-links">
+                <a class="next page-numbers" href="https://eiun.github.io/post/rao-guo-android-10-de-fan-she-xian-zhi-fang-fa/">下一篇->绕过Android 10的反射限制方法</a>
+              </div>
+            </nav>
+          
+      </div>
+      <section id="comments" class="comments">
         
-        
+      </section>
     </div>
-</nav>
+  </div>
 
-                <footer id="site-footer" class="site-footer" role="contentinfo">
+  <footer id="site-footer" class="site-footer" role="contentinfo">
     <h1>
         <a href="https://eiun.github.io"> Eiun </a>
     </h1>
@@ -211,6 +239,7 @@
 <script src="https://eiun.github.io/media/scripts/lib/jquery.min.js"></script>
 <script src="https://eiun.github.io/media/scripts/lib/jquerymigrate.js"></script>
 <script src="https://eiun.github.io/media/scripts/lib/production.min.js"></script>
-        </div>
-    </body>
+</div>
+</body>
 </html>
+
